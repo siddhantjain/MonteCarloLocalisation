@@ -11,6 +11,8 @@ from matplotlib import pyplot as plt
 from matplotlib import figure as fig
 import time
 
+import random
+
 def visualize_map(occupancy_map):
     fig = plt.figure()
     # plt.switch_backend('TkAgg')
@@ -46,10 +48,26 @@ def init_particles_freespace(num_particles, occupancy_map):
     # initialize [x, y, theta] positions in world_frame for all particles
     # (in free space areas of the map)
 
+    #Siddhant Find out free space areas of the map
     """
-    TODO : Add your code here
-    """ 
 
+    TODO : (siddhant) Vectorise this code here
+    """
+    unoccupiedSpacesList = []
+    particleWeightInit = 1.0/num_particles
+    [numCols, numRows] = occupancy_map.shape
+    for eachX in range(numRows):
+        for eachY in range(numCols):
+            if(occupancy_map[eachY,eachX]==0):
+                theta_init = np.random.uniform(-3.14,3.14)
+                x_init = np.random.uniform(eachX*10,eachX*10+10.0)
+                y_init = np.random.uniform(eachY*10, eachY*10 + 10.0)
+
+                unoccupiedSpacesList.append([x_init,y_init,theta_init,particleWeightInit])
+
+
+    initialParticlesList = random.sample(unoccupiedSpacesList,num_particles)
+    X_bar_init = np.array(initialParticlesList)
     return X_bar_init
 
 def main():
@@ -79,7 +97,8 @@ def main():
     resampler = Resampling()
 
     num_particles = 500
-    X_bar = init_particles_random(num_particles, occupancy_map)
+    #X_bar = init_particles_random(num_particles, occupancy_map)
+    X_bar = init_particles_freespace(num_particles, occupancy_map)
 
     vis_flag = 1
 

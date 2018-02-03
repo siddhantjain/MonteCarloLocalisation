@@ -27,7 +27,8 @@ class MotionModel:
         """
         TODO : Add your code here
         """
-
+        # Adding the following one line for compiling starter code. Remove when implementing this
+        x_t1 = x_t0;
         return x_t1
 
 if __name__=="__main__":

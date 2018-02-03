@@ -36,7 +36,8 @@ class Resampling:
         """
         TODO : Add your code here
         """
-        
+        # Adding the following one line for compiling starter code. Remove when implementing this
+        X_bar_resampled = X_bar
         return X_bar_resampled
 
 if __name__ == "__main__":

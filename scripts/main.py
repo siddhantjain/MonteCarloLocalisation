@@ -52,6 +52,8 @@ def init_particles_freespace(num_particles, occupancy_map):
     """
 
     TODO : (siddhant) Vectorise this code here
+    TODO: (siddhant) account for 0.5 probability occupancy, so basically include points if a random number generated
+    is greater than 0.5
     """
     unoccupiedSpacesList = []
     particleWeightInit = 1.0/num_particles

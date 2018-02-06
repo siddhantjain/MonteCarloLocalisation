@@ -5,7 +5,24 @@ from matplotlib import pyplot as plt
 from scipy.stats import norm
 import pdb
 
+import bresenham
+
 from MapReader import MapReader
+
+vis_flag = 1
+def visualize_map(occupancy_map):
+    fig = plt.figure()
+    # plt.switch_backend('TkAgg')
+    mng = plt.get_current_fig_manager();  # mng.resize(*mng.window.maxsize())
+    plt.ion(); plt.imshow(occupancy_map, cmap='Greys'); plt.axis([0, 800, 0, 800]);
+
+
+def visualize_raycast(ray):
+    x_locs = [x[0] for x in ray]
+    y_locs = [x[1] for x in ray]
+    scat = plt.scatter(x_locs, y_locs, c='r', marker='o')
+    plt.pause(0.00001)
+    scat.remove()
 
 class SensorModel:
 
@@ -14,17 +31,43 @@ class SensorModel:
     [Chapter 6.3]
     """
 
+    DEG_2_RAD = 0.0174533;
     def __init__(self, occupancy_map):
         self._occupancy_map = occupancy_map;
         self.zHit = 1;
         self.zShort = 1;
         self.zMax = 1;
         self.zRand = 1;
+        self.DEG_2_RAD = 0.0174533
         """
         TODO : Initialize Sensor Model parameters here
         """
     def raycast(self, pos,angle):
-        range = 0;
+        theta = pos[2]+angle*self.DEG_2_RAD
+        xStart = pos[0]/10
+        yStart = pos[1]/10
+
+        xEnd = xStart + 500*math.cos(theta);
+        yEnd = yStart + 500*math.sin(theta);
+
+        hit_x =0;
+        hit_y =0;
+        linePoints = list(bresenham.bresenham(int(xStart),int(yStart),int(xEnd),int(yEnd)))
+
+        if vis_flag:
+            visualize_raycast(linePoints)
+
+        for each in linePoints:
+          #TODO: change the occupancy condition to generate a random number instead of naively checking for being
+          #greater than 0.5
+            if self._occupancy_map[each[1]][each[0]] >= 0.5:
+                hit_x = each[0]
+                hit_y = each[1]
+                break;
+
+        deltax = abs(pos[0] - hit_x*10)
+        deltay = abs(pos[1] - hit_y*10)
+        range = (deltax**2 + deltay**2)**0.5
 
         return range
     def calcPHit(self):
@@ -56,6 +99,8 @@ class SensorModel:
         """
         q =1
         i=0
+        if vis_flag:
+            visualize_map(self._occupancy_map);
         #TODO: siddhant: write cleaner code. remove constant 180
         for i in range(180):
             if i%5 ==0:

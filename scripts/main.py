@@ -27,6 +27,9 @@ def visualize_timestep(X_bar, tstep):
     plt.pause(0.00001)
     scat.remove()
 
+
+
+
 def init_particles_random(num_particles, occupancy_map):
 
     # initialize [x, y, theta] positions in world_frame for all particles
@@ -62,7 +65,7 @@ def init_particles_freespace(num_particles, occupancy_map):
         for eachY in range(numCols):
             if(occupancy_map[eachY,eachX]==0):
                 theta_init = np.random.uniform(-3.14,3.14)
-                x_init = np.random.uniform(eachX*10,eachX*10+10.0)
+                x_init = np.random.uniform(eachX*10,eachX*10 + 10.0)
                 y_init = np.random.uniform(eachY*10, eachY*10 + 10.0)
 
                 unoccupiedSpacesList.append([x_init,y_init,theta_init,particleWeightInit])

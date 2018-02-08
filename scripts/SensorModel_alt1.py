@@ -39,6 +39,9 @@ class SensorModel:
         self.zMax = 1;
         self.zRand = 1;
         self.DEG_2_RAD = 0.0174533
+        self.sigmaHit = 1;
+        self.etaPHit = 1;
+        self.etaPshort = 1;
         """
         TODO : Initialize Sensor Model parameters here
         """
@@ -46,6 +49,8 @@ class SensorModel:
         theta = pos[2]+angle*self.DEG_2_RAD
         xStart = pos[0]/10
         yStart = pos[1]/10
+
+        #change the constant 500 here to a smaller value, ideally just zmax.
 
         xEnd = xStart + 500*math.cos(theta);
         yEnd = yStart + 500*math.sin(theta);
@@ -58,9 +63,8 @@ class SensorModel:
             visualize_raycast(linePoints)
 
         for each in linePoints:
-          #TODO: change the occupancy condition to generate a random number instead of naively checking for being
-          #greater than 0.5
-            if self._occupancy_map[each[1]][each[0]] >= 0.5:
+          #TODO: change the occupancy condition to generate a random number instead of naively checking for non zero values
+            if self._occupancy_map[each[1]][each[0]] <> 0:
                 hit_x = each[0]
                 hit_y = each[1]
                 break;
@@ -70,8 +74,14 @@ class SensorModel:
         range = (deltax**2 + deltay**2)**0.5
 
         return range
-    def calcPHit(self):
-        pHit = 1
+    def calcPHit(self, z_k_star,z_k_t):
+        constant = 2*math.pi*self.sigmaHit*self.sigmaHit
+        constant = constant**0.5
+        constant = 1.0/constant
+
+        exponentTerm = -0.5*(z_k_star - z_k_t)*(z_k_star - z_k_t)/(self.sigmaHit*self.sigmaHit)
+
+        pHit = constant*(math.e**exponentTerm)
 
         return pHit
 
@@ -92,10 +102,6 @@ class SensorModel:
         param[in] z_t1_arr : laser range readings [array of 180 values] at time t
         param[in] x_t1 : particle state belief [x, y, theta] at time t [world_frame]
         param[out] prob_zt1 : likelihood of a range scan zt1 at time t
-        """
-
-        """
-        TODO : Add your code here
         """
         q =1
         i=0

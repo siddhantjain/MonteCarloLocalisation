@@ -9,7 +9,7 @@ import bresenham
 
 from MapReader import MapReader
 
-vis_flag = 1
+vis_flag = 0
 def visualize_map(occupancy_map):
     fig = plt.figure()
     # plt.switch_backend('TkAgg')
@@ -111,13 +111,15 @@ class SensorModel:
         for i in range(180):
             if i%5 ==0:
                 z_k_star =  self.raycast(x_t1,i)
-                p_hit = self.calcPHit()
+                z_k_t = z_t1_arr[i]
+                p_hit = self.calcPHit(z_k_star,z_k_t)
                 p_short = self.calcPShort()
                 p_max = self.calcPMax()
                 p_rand = self.calcPRand()
 
                 p = self.zHit*p_hit + self.zShort*p_short + self.zMax*p_max + self.zRand*p_rand
                 q = q*p
+
         return q    
  
 if __name__=='__main__':

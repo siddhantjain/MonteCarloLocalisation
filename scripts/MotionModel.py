@@ -11,8 +11,8 @@ class MotionModel:
     [Chapter 5]
     """
 
-    def __init__(self,alphas):
-        self.initAlphas=alphas
+    def __init__(self):
+        self.initAlphas=[1,1,1,1]
 
     def noiseSample(self,mu,sig):
         return np.random.normal(mu,sig)

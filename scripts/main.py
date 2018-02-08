@@ -24,7 +24,7 @@ def visualize_timestep(X_bar, tstep):
     x_locs = X_bar[:,0]/10.0
     y_locs = X_bar[:,1]/10.0
     scat = plt.scatter(x_locs, y_locs, c='r', marker='o')
-    plt.pause(0.00001)
+    plt.pause(0.00002)
     scat.remove()
 
 

@@ -35,6 +35,8 @@ class SensorModel:
     DEG_2_RAD = 0.0174533;
     def __init__(self, occupancy_map):
         self._occupancy_map = occupancy_map;
+
+
         self.zHit = 0.49;
         self.zShort = 0.25;
         self.zMax = 0.0005;
@@ -42,8 +44,8 @@ class SensorModel:
         self.DEG_2_RAD = 0.0174533
         self.sigmaHit = 250;
         self.etaPHit = 1;
-        self.lambdaShort = 0.01;
-        self.Z_MAX = 8184
+        self.lambdaShort = 0.001;
+        self.Z_MAX = 8183
         self.Z_MAX_INVERSE = 1.0/self.Z_MAX
         self.sense_noise = 500
         """
@@ -103,7 +105,7 @@ class SensorModel:
         return range
 
     def calcPHit(self, z_k_star,z_k_t):
-        if z_k_t >= self.zMax:
+        if z_k_t >= self.Z_MAX:
             return 0
         constant = 2*math.pi*self.sigmaHit*self.sigmaHit
         constant = constant**0.5

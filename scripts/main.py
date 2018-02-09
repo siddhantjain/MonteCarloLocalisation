@@ -157,7 +157,10 @@ def main():
                 X_bar_new[m,:] = np.hstack((x_t1, w_t))
             else:
                 X_bar_new[m,:] = np.hstack((x_t1, X_bar[m,3]))
-        
+
+        if (meas_type == "L"):
+            X_bar_new[:, 3] = X_bar_new[:, 3]/sum(X_bar_new[:, 3])
+
         X_bar = X_bar_new
         u_t0 = u_t1
 

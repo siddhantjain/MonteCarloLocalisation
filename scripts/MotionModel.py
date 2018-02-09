@@ -1,8 +1,8 @@
 import sys
 import numpy as np
 import math
-
-
+import random
+from MapReader import MapReader
 
 class MotionModel:
 
@@ -12,44 +12,84 @@ class MotionModel:
     """
 
     def __init__(self):
-        self.initAlphas=[1,1,1,1]
 
-    def noiseSample(self,mu,sig):
-        return np.random.normal(mu,sig)
+        """
+        TODO : Initialize Motion Model parameters here
+        """
+        #self.angle_noise = 0.1
+        #self.distance_noise = 5.0
+        #self.sigma_trans = 0.0
+        #self.sigma_theta = 0
+        self.alpha1 = 0.005
+        self.alpha2 = 0.005
+        self.alpha3 = 0.0025
+        self.alpha4 = 0.0025
 
     def update(self, u_t0, u_t1, x_t0):
         """
-        param[in] u_t0 : particle state odometry reading [x, y, theta] at time (t-1) [odometry_frame]   
+        param[in] u_t0 : particle state odometry reading [x, y, theta] at time (t-1) [odometry_frame]
         param[in] u_t1 : particle state odometry reading [x, y, theta] at time t [odometry_frame]
         param[in] x_t0 : particle state belief [x, y, theta] at time (t-1) [world_frame]
         param[out] x_t1 : particle state belief [x, y, theta] at time t [world_frame]
         """
 
-        #Implementing the odometry motion model
-        deltaRot1=math.atan2(u_t1[1]-u_t0[1],u_t0[1]-u_t0[0])
-        deltaTrans=math.sqrt((u_t0[0]-u_t1[0])**2+(u_t0[1]-u_t1[1])**2)
-        deltaRot2=u_t1[2]-u_t0[2]-deltaRot1
+        """
+        TODO : Add your code here
+        """
 
-        #calculating sigma for gaussian noise
-        sigRot1=abs(self.initAlphas[0]*deltaRot1**2 + self.initAlphas[1]*deltaTrans**2)
-        sigTrans = abs(self.initAlphas[2]*deltaTrans**2+self.initAlphas[3]*deltaRot1**2+self.initAlphas[3]*deltaRot2**2)
-        sigRot2 = abs(self.initAlphas[0]*deltaRot2**2+self.initAlphas[1]*deltaTrans**2)
+        x_bar_prime = u_t1[0] # x coordinates for odometry control info at time t
+        y_bar_prime = u_t1[1] # y coordinates for odometry control info at time t
+        theta_bar_prime = u_t1[2] # theta for odometry control info at time t
+        x_bar = u_t0[0] # x coordinates for odometry control info at time t-1
+        y_bar = u_t0[1] # y coordinates for odometry control info at time t-1
+        theta_bar = u_t0[2] # theta for odometry control info at time t-1
 
+        # the difference between odometry information at time t-1 and t
+        delta_rot1 = np.arctan2(y_bar_prime - y_bar, x_bar_prime - x_bar) - theta_bar
+        delta_trans = np.sqrt((y_bar_prime - y_bar)**2 + (x_bar_prime - x_bar)**2)
+        delta_rot2 = theta_bar_prime - theta_bar - delta_rot1
 
-        #calculating the hat deltas
-        deltaHatRot1=deltaRot1-self.noiseSample(0,sigRot1)
-        deltaHatTrans=deltaTrans-self.noiseSample(0,sigTrans)
-        deltaHatRot2=deltaRot2-self.noiseSample(0,sigRot2)
+        # the predicted difference between the robot coordinates at time t-1 and t
+        delta_rot1_hat = delta_rot1 + np.random.normal(0.0, self.alpha1*abs(delta_rot1) + self.alpha2*delta_trans)
+        delta_trans_hat = delta_trans + np.random.normal(0.0, self.alpha3*delta_trans + self.alpha4*(abs(delta_rot1) + abs(delta_rot2)))
+        delta_rot2_hat = delta_rot2 + np.random.normal(0.0, self.alpha1*abs(delta_rot2) + self.alpha2*delta_trans)
 
-        x_t1=x_t0
-
-        #reinitializing
-        x_t1[0]= x_t0[0]+deltaHatRot1*math.cos(deltaRot1-deltaHatRot1)
-        x_t1[1] = x_t0[1] + deltaHatTrans * math.cos(deltaTrans - deltaHatTrans)
-        x_t1[2] = x_t0[2] + deltaHatRot2 * math.cos(deltaRot2 - deltaHatRot2)
-
+        # the predicted particle coordinates
+        x_t1 = np.zeros(3)
+        x_t1[0] = x_t0[0] + delta_trans_hat * np.cos(x_t0[2] + delta_rot1_hat)
+        x_t1[1] = x_t0[1] + delta_trans_hat * np.sin(x_t0[2] + delta_rot1_hat)
+        x_t1[2] = x_t0[2] + delta_rot1_hat + delta_rot2_hat
         return x_t1
 
+        """
+        # change from odometry measurement
+        delta_ux = u_t1[0] - u_t0[0]
+        delta_uy = u_t1[1] - u_t0[1]
+        delta_utheta = u_t1[2] - u_t0[2]
+
+        cos_theta = np.cos(u_t1[2])
+        sin_theta = np.sin(u_t1[2])
+        if cos_theta > 0.5:
+            trans = delta_ux / cos_theta
+        else:
+            trans = delta_uy / sin_theta
+
+        # calculate the new theta for robot
+        theta_error = delta_utheta * self.sigma_theta * np.random.normal(0.0, 0.0)
+        theta = x_t0[2] + delta_utheta + theta_error
+        theta = (theta - np.pi) % (2 * np.pi)
+
+        #add translational error
+        trans_error = trans * self.sigma_trans * np.random.normal()
+        trans += trans_error
+        # x_t0
+        x = x_t0[0] + trans * np.cos(theta)
+        y = x_t0[1] + trans * np.sin(theta)
+
+        x_t1 = np.array([x, y, theta])
+
+        return x_t1
+        """
 
 
 if __name__=="__main__":

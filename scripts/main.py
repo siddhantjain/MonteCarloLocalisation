@@ -13,6 +13,27 @@ import time
 
 import random
 
+def visualiseSensorModel(sensor_model):
+    zHit = 0.49;
+    zShort = 0.25;
+    zMax = 0.0005;
+    zRand = 0.25;
+    z_k_t = np.arange(0, 8184)
+    # p = sensor_model.calcPHit(1000, z_k_t)
+    p = []
+    for i in range(len(z_k_t)):
+        # p.append(sensor_model.calcPMax(z_k_t[i]));
+        # p.append(sensor_model.calcPRand(z_k_t[i]));
+        # zHit zShort zMax zRand
+        p.append(zHit * sensor_model.calcPHit(4000, z_k_t[i]) +
+                 zShort * sensor_model.calcPShort(4000, z_k_t[i]) +
+                 zMax * sensor_model.calcPMax(z_k_t[i]) +
+                 zRand * sensor_model.calcPRand(z_k_t[i]))
+        # p.append(sensor_model.calcPShort(4000, z_k_t[i]));
+    plt.plot(z_k_t, p)
+    plt.show()
+    plt.pause(1000)
+
 def visualize_map(occupancy_map):
     fig = plt.figure()
     # plt.switch_backend('TkAgg')
@@ -100,6 +121,11 @@ def main():
     motion_model = MotionModel()
     sensor_model = SensorModel(occupancy_map)
     resampler = Resampling()
+
+    vis_flag_sensor_model = 0
+
+    if vis_flag_sensor_model:
+        visualiseSensorModel(sensor_model)
 
     num_particles = 500
     #X_bar = init_particles_random(num_particles, occupancy_map)

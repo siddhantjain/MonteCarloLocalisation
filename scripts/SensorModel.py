@@ -40,10 +40,10 @@ class SensorModel:
         self.zMax = 0.0005;
         self.zRand = 0.25;
         self.DEG_2_RAD = 0.0174533
-        self.sigmaHit = 120;
+        self.sigmaHit = 250;
         self.etaPHit = 1;
         self.lambdaShort = 0.01;
-        self.Z_MAX = 8183
+        self.Z_MAX = 8184
         self.Z_MAX_INVERSE = 1.0/self.Z_MAX
         self.sense_noise = 500
         """

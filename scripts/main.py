@@ -76,14 +76,13 @@ def init_particles_freespace(num_particles, occupancy_map):
     """
 
     TODO : (siddhant) Vectorise this code here
-    TODO: (siddhant) account for 0.5 probability occupancy, so basically include points if a random number generated
     is greater than 0.5
     """
     unoccupiedSpacesList = []
     particleWeightInit = 1.0/num_particles
     [numCols, numRows] = occupancy_map.shape
-    for eachX in range(numRows):
-        for eachY in range(numCols):
+    for eachX in range(400,480):
+        for eachY in range(350,450):
             if(occupancy_map[eachY,eachX]==0):
                 theta_init = np.random.uniform(-3.14,3.14)
                 x_init = np.random.uniform(eachX*10,eachX*10 + 10.0)
@@ -155,7 +154,8 @@ def main():
         if (meas_type == "L"):
              odometry_laser = meas_vals[3:6] # [x, y, theta] coordinates of laser in odometry frame
              ranges = meas_vals[6:-1] # 180 range measurement values from single laser scan
-        
+        else:
+            continue #skipping for saving time
         print "Processing time step " + str(time_idx) + " at time " + str(time_stamp) + "s"
 
         if (first_time_idx):
@@ -178,7 +178,7 @@ def main():
             """
             if (meas_type == "L"):
                 z_t = ranges
-                w_t = sensor_model.beam_range_finder_model(z_t, x_t1)
+                w_t = sensor_model.beam_range_finder_model(z_t, x_t1 - (odometry_robot - odometry_laser))
                 # w_t = 1/num_particles
                 X_bar_new[m,:] = np.hstack((x_t1, w_t))
             else:

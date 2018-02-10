@@ -20,10 +20,11 @@ class MotionModel:
         #self.distance_noise = 5.0
         #self.sigma_trans = 0.0
         #self.sigma_theta = 0
-        self.alpha1 = 0.5
-        self.alpha2 = 0.5
-        self.alpha3 = 0.25
-        self.alpha4 = 0.25
+        self.alpha1 = 0.0000000001
+        self.alpha2 = 0.0000000001
+        self.alpha3 = 0.000000005
+        self.alpha4 = 0.000000005
+
 
     def update(self, u_t0, u_t1, x_t0):
         """
@@ -50,9 +51,9 @@ class MotionModel:
         delta_rot2 = theta_bar_prime - theta_bar - delta_rot1
 
         # the predicted difference between the robot coordinates at time t-1 and t
-        delta_rot1_hat = delta_rot1 - np.random.normal(0.0, self.alpha1*abs(delta_rot1) + self.alpha2*delta_trans)
-        delta_trans_hat = delta_trans - np.random.normal(0.0, self.alpha3*delta_trans + self.alpha4*(abs(delta_rot1) + abs(delta_rot2)))
-        delta_rot2_hat = delta_rot2 - np.random.normal(0.0, self.alpha1*abs(delta_rot2) + self.alpha2*delta_trans)
+        delta_rot1_hat = delta_rot1 - np.random.normal(0.0, self.alpha1*(delta_rot1**2) + self.alpha2*(delta_trans**2))
+        delta_trans_hat = delta_trans - np.random.normal(0.0, self.alpha3*(delta_trans**2) + self.alpha4*((delta_rot1**2) + (delta_rot2**2)))
+        delta_rot2_hat = delta_rot2 - np.random.normal(0.0, self.alpha1*(delta_rot2**2) + self.alpha2*(delta_trans**2))
 
         # the predicted particle coordinates
         x_t1 = np.zeros(3)

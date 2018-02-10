@@ -22,7 +22,7 @@ def visualize_raycast(ray):
     x_locs = [x[0] for x in ray]
     y_locs = [x[1] for x in ray]
     scat = plt.scatter(x_locs, y_locs, c='r', marker='o')
-    plt.pause(0.00001)
+    plt.pause(0.1)
     scat.remove()
 
 class SensorModel:
@@ -37,9 +37,9 @@ class SensorModel:
         self._occupancy_map = occupancy_map;
 
 
-        self.zHit = 0.49;
+        self.zHit = 0.25;
         self.zShort = 0.25;
-        self.zMax = 0.0005;
+        self.zMax = 0.25;
         self.zRand = 0.25;
         self.DEG_2_RAD = 0.0174533
         self.sigmaHit = 250;
@@ -64,17 +64,22 @@ class SensorModel:
 
         dist = max_dist;
         while(self._occupancy_map[y,x] != -1):
-            if(self._occupancy_map[y,x] > 0.7):
+            if(self._occupancy_map[y,x] > 0.3):
                 dist = min(np.sqrt((x-x0) **2 + (y-y0)**2),max_dist)
                 break
 
             x = x + int(stride* np.cos(theta))
             y = y + int(stride* np.sin(theta))
 
+        vis_flag = 0
+        if vis_flag:
+            finalRayPoints = list(bresenham.bresenham(int(x0), int(y0), int(x), int(y)))
+            visualize_raycast(finalRayPoints)
+
         return dist
 
     def raycast_alt(self, pos,angle):
-        theta = pos[2]+ angle*self.DEG_2_RAD
+        theta = pos[2]+ (angle-90)*self.DEG_2_RAD
         xStart = pos[0]/10
         yStart = pos[1]/10
 
@@ -169,7 +174,7 @@ class SensorModel:
             p_rand = self.calcPRand(z_k_t)
 
             p = self.zHit*p_hit + self.zShort*p_short + self.zMax*p_max + self.zRand*p_rand
-            q += log(p)
+            q += log(p,10)
 
         return q    
  

@@ -1,6 +1,7 @@
 import numpy as np
 import sys
 import pdb
+import math
 
 from MapReader import MapReader
 from MotionModel import MotionModel
@@ -14,11 +15,12 @@ import time
 import random
 
 def visualiseSensorModel(sensor_model):
-    zHit = 0.49;
-    zShort = 0.25;
-    zMax = 0.0005;
-    zRand = 0.25;
-    z_k_t = np.arange(0, 8184)
+    return
+    zHit = sensor_model.zHit;
+    zShort = sensor_model.zShort;
+    zMax = sensor_model.zMax;
+    zRand = sensor_model.zRand;
+    z_k_t = np.arange(0, 8192)
     # p = sensor_model.calcPHit(1000, z_k_t)
     p = []
     for i in range(len(z_k_t)):
@@ -32,7 +34,6 @@ def visualiseSensorModel(sensor_model):
         # p.append(sensor_model.calcPShort(4000, z_k_t[i]));
     plt.plot(z_k_t, p)
     plt.show()
-    plt.pause(1000)
 
 def visualize_map(occupancy_map):
     fig = plt.figure()
@@ -81,10 +82,10 @@ def init_particles_freespace(num_particles, occupancy_map):
     unoccupiedSpacesList = []
     particleWeightInit = 1.0/num_particles
     [numCols, numRows] = occupancy_map.shape
-    for eachX in range(400,480):
-        for eachY in range(350,450):
+    for eachX in range(numCols):
+        for eachY in range(numRows):
             if(occupancy_map[eachY,eachX]==0):
-                theta_init = np.random.uniform(-3.14,3.14)
+                theta_init = np.random.uniform(-math.pi,math.pi)
                 x_init = np.random.uniform(eachX*10,eachX*10 + 10.0)
                 y_init = np.random.uniform(eachY*10, eachY*10 + 10.0)
 
@@ -121,7 +122,7 @@ def main():
     sensor_model = SensorModel(occupancy_map)
     resampler = Resampling()
 
-    vis_flag_sensor_model = 0
+    vis_flag_sensor_model = 1
 
     if vis_flag_sensor_model:
         visualiseSensorModel(sensor_model)
@@ -178,7 +179,7 @@ def main():
             """
             if (meas_type == "L"):
                 z_t = ranges
-                w_t = sensor_model.beam_range_finder_model(z_t, x_t1 - (odometry_robot - odometry_laser))
+                w_t = sensor_model.beam_range_finder_model(z_t, x_t1)
                 # w_t = 1/num_particles
                 X_bar_new[m,:] = np.hstack((x_t1, w_t))
             else:
@@ -189,6 +190,7 @@ def main():
 
         X_bar = X_bar_new
         u_t0 = u_t1
+
 
         """
         RESAMPLING

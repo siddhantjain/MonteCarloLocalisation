@@ -28,6 +28,29 @@ class Resampling:
 
         return X_bar_resampled
 
+
+
+    def low_variance_sampler_alt(self,X_bar):
+        X_bar_resampledL = []
+        M = len(X_bar)
+        c = X_bar[0,3]
+        i = 0
+        r = random.uniform(0,1.0/M)
+        for m in range(M):
+            U = r + (m-1)*(1.0/M)
+
+            while(U > c):
+                i = i+1
+                if(i==M):
+                    i=0
+                c = c+X_bar[i,3]
+
+
+            X_bar_resampledL.append(X_bar[i,:])
+
+        X_bar_resampled = np.asarray(X_bar_resampledL)
+        return X_bar_resampled
+
     def low_variance_sampler(self, X_bar):
 
         """

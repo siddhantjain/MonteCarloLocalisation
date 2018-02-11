@@ -37,34 +37,38 @@ class SensorModel:
         self._occupancy_map = occupancy_map;
 
 
-        self.zHit = 0.25;
-        self.zShort = 0.25;
-        self.zMax = 0.25;
-        self.zRand = 0.25;
+
+        self.zHit = 0.8;
+        self.zShort = 0.133;
+        self.zMax = 0.000325;
+        self.zRand = 0.133;
         self.DEG_2_RAD = 0.0174533
-        self.sigmaHit = 250;
+        self.sigmaHit = 700;
         self.etaPHit = 1;
         self.lambdaShort = 0.001;
-        self.Z_MAX = 8183
+        self.Z_MAX = 8191
         self.Z_MAX_INVERSE = 1.0/self.Z_MAX
         self.sense_noise = 500
         """
         TODO : Initialize Sensor Model parameters here
         """
     def raycast(self,pos,angle):
-        theta = pos[2] +  angle*self.DEG_2_RAD
+        theta = pos[2] + angle*self.DEG_2_RAD
         x = int(pos[0]/10)
         y = int(pos[1]/10)
 
+        #accounting for offset
+        x = x + 25*cos(pos[2])
+        y = y + 25*sin(pos[2])
         x0 = x
-        y0 =y
+        y0 = y
 
         max_dist = max(self._occupancy_map.shape)
         stride =5
 
-        dist = max_dist;
+        dist = self.Z_MAX;
         while(self._occupancy_map[y,x] != -1):
-            if(self._occupancy_map[y,x] > 0.3):
+            if(self._occupancy_map[y,x] > 0.9):
                 dist = min(np.sqrt((x-x0) **2 + (y-y0)**2),max_dist)
                 break
 
@@ -154,7 +158,7 @@ class SensorModel:
         param[in] x_t1 : particle state belief [x, y, theta] at time t [world_frame]
         param[out] prob_zt1 : likelihood of a range scan zt1 at time t
         """
-        q =0
+        q =1
         i=0
         if vis_flag:
             visualize_map(self._occupancy_map);
